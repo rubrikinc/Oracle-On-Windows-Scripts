@@ -148,7 +148,6 @@ $SECTION_SIZE = '100G'
 ###################################################
 $logdate = Get-Date -Format FileDateTime
 $logdate = $logdate -replace ".{4}$"
-$logdate -replace ".{4}$"
 if ($LOG) {
     $logname = $logname + '_LOG_'
 } else {
