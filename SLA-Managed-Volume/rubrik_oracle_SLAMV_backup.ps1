@@ -11,8 +11,7 @@ This PowerShell script will take a RMAN backup of an Oracle databae to a Rubrik 
 This script will build and run a dynamic RMAN backup. The ORACLE_SID should match the managed volume name 
 or the managed volume name will need to be supplied. The MV_NAME is optional. Use the DATABASE flag for a 
 database only backup, the LOG flag for an archivelog only backup. If no backup type flag (DATABASE or LOG)
-is supplied both a database and archive log backup will be done. Use the FULL flag to do a full backupset 
-backup instead of the default incremental merge. 
+is supplied both a database and archive log backup will be done. 
 
 Note this script does not delete archived logs from the host after they are backed up. This should be done in 
 a post script added to the SLA Managed Volume.
@@ -23,8 +22,8 @@ an ORACLE_HOME parameter must be supplied.
 
 .EXAMPLE
 
-This is called from the SLA MV. When setting the script for the SLA MV use the format: powershell <script path>  <options>
 powershell C:\Scripts\Rubrik_Oracle_SLAMV_Backup.ps1 -ORACLE_SID dbname -MV_NAME managed_volume_name -ORACLE_HOME oracle_home -DATABASE -FULL
+
 
 .NOTES
 To prepare to use this script complete the following steps:
@@ -148,7 +147,18 @@ $SECTION_SIZE = '100G'
 # Create log file
 ###################################################
 $logdate = Get-Date -Format FileDateTime
+$logdate = $logdate -replace ".{4}$"
+$logdate -replace ".{4}$"
+if ($LOG) {
+    $logname = $logname + '_LOG_'
+} else {
+    $logname = $logname + '_DB_'
+}
 $logfile = $logdir + '\' + $logname + $logdate + '.txt'
+
+###################################################
+# Start logging
+###################################################
 $ErrorActionPreference="SilentlyContinue"
 Stop-Transcript | out-null
 $ErrorActionPreference = "Continue"
@@ -406,7 +416,12 @@ try{
 # Check the log files for errors
 ###################################################
 Write-Host "Parsing the log file for errors..."
-$errors = Get-Content -path $logfile | Select-String "RMAN-[0-2]" -Exclude "RMAN-08138"
+# Find the RMAN-{0-2] errors in the log
+$errors = Get-Content -path $logfile | Select-String "RMAN-[0-2]"
+# Remove normal errors 
+# Error ignored is "RMAN-08138: warning: archived log not deleted - must create more backups" 
+# Repeat next line for additional errors to ignore
+$errors = $errors | Select-String -notmatch "RMAN-08138"
 if ($errors) {
     $Message = "RMAN Script Error" 
     $Message = $Message + "`nDatabase SID: $ORACLE_SID"
