@@ -122,16 +122,16 @@ Import-Module Rubrik
 ###################################################
 ###################################################
 # Address of the Rubrik CDM cluster (IP or FQDN)
-$RubrikAddress = '10.8.48.201'
+$RubrikAddress = '10.1.1.11'
 # Location of API key file (optional, can use CredentialFile or RubrikUser/RubrikPassword instead)
-$ApiTokenFile = 'C:\Scripts\RubrikAPI.xml'
+$ApiTokenFile = 'C:\Rubrik\scripts\RubrikAPI.xml'
 # Location of credential file (optional, can use APITokenFile or RubrikUser/RubrikPassword instead)
 $CredentialFile = ''
 # Rubrik CDM user and password (optional, can use APITokenFile or CredentialFile instead)
 $RubrikUser = ''
 $RubrikPassword = ''
 # Log directory - This must exist for the script to run
-$logdir = 'C:\Scripts\Logs'
+$logdir = 'C:\Rubrik\logs'
 # Log name format
 $logname = $Oracle_SID + '_slamv'
 # Number of days (negative number) of backup script logs to retain

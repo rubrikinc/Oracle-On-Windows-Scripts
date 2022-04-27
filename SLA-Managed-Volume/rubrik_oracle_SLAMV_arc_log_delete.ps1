@@ -80,7 +80,7 @@ param (
 ###################################################
 ###################################################
 # Log directory - This must exist for the script to run
-$logdir = 'C:\Scripts\Logs'
+$logdir = 'C:\Rubrik\logs'
 # Log name format
 $logname = $Oracle_SID + '_log_delete_'
 # Number of copies of the archive logs backed up before they are deleted
