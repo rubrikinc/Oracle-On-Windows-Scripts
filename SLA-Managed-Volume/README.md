@@ -58,30 +58,30 @@ C:\Rubrik\dbname<br>
 
 #### Pane 1
 
-> `Name: dbname` <br>
-`Provisioned Size (GB): 4X allocated  DB size for start` <br>
-`Subnet (Optional): Used if multiple VLANs in use` <br>
-`Number of Channels: If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
-`IP or Hostname: Oracle host with database and Rubrik Connector installed`
+> Name: `dbname` <br>
+Provisioned Size (GB): `4X allocated  DB size for start` <br>
+Subnet (Optional): `Used if multiple VLANs in use` <br>
+Number of Channels: `If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
+IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 
 #### Pane 2
-> `Domain: You Active Directory Domain` <br>
-`Username: The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-`Active Directory Groups (Optional): Can be used instead of th username` <br>
-`Mount point paths on the host:` <br>
+> Domain: `Your Active Directory Domain` <br>
+Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
+Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
 `C:\Rubrik\dbname\db_c2` <br>
 `C:\Rubrik\dbname\db_c3` 
     
 #### Pane 3
-> `Command  to run on the host:` <br> 
+> Command  to run on the host: <br> 
 `powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname` <br>
-`Enable pre-backup and post-backup commands: Check` <br>
+Enable pre-backup and post-backup commands: `Check` <br>
 
-> `Command to run on successful backup:` <br>
+> Command to run on successful backup: <br>
 `powershell C:/Scripts/rubrik_oracle_SLAMV_arc_log_delete.ps1 -ORACLE_SID dbname` <br>
-`Timeout:` <br>
+Timeout: <br>
 `Set to longer than log delete will take, example 600` <br>
 
 ## B) Database backup with higher frequency archive log backups. This requires 2 SLA managed volumes and 2 SLA Domain Policies. One for the database backup and one for the archive log backups.
@@ -89,90 +89,90 @@ C:\Rubrik\dbname<br>
 ### a) DB SLA Managed Volume
 #### Pane 1
 
-> `Name: dbname_db` <br>
-`Provisioned Size (GB): 4X allocated  DB size for start` <br>
-`Subnet (Optional): Used if multiple VLANs in use` <br>
-`Number of Channels: If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
-`IP or Hostname: Oracle host with database and Rubrik Connector installed`
+> Name: `dbname_db` <br>
+Provisioned Size (GB): `4X allocated  DB size for start` <br>
+Subnet (Optional): `Used if multiple VLANs in use` <br>
+Number of Channels: `If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
+IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 
 #### Pane 2
-> `Domain: You Active Directory Domain` <br>
-`Username: The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-`Active Directory Groups (Optional): Can be used instead of th username` <br>
-`Mount point paths on the host:` <br>
+> Domain: `Your Active Directory Domain` <br>
+Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
+Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
 `C:\Rubrik\dbname\db_c2` <br>
 `C:\Rubrik\dbname\db_c3` 
     
 #### Pane 3
-> `Command  to run on the host:` <br> 
+> Command  to run on the host: <br> 
 `powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -DATABASE` <br>
-`Enable pre-backup and post-backup commands: Unchecked` <br>
+Enable pre-backup and post-backup commands: `Unchecked` <br>
 
 ### b) Archive Log SLA Managed Volume
 #### Pane 1
 
-> `Name: dbname_log` <br>
-`Provisioned Size (GB): 4X allocated  DB size for start` <br>
-`Subnet (Optional): Used if multiple VLANs in use` <br>
-`Number of Channels: If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
-`IP or Hostname: Oracle host with database and Rubrik Connector installed`
+> Name: `dbname_log` <br>
+Provisioned Size (GB): `4X allocated  DB size for start` <br>
+Subnet (Optional): `Used if multiple VLANs in use` <br>
+Number of Channels: `If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
+IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 
 #### Pane 2
-> `Domain: You Active Directory Domain` <br>
-`Username: The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-`Active Directory Groups (Optional): Can be used instead of th username` <br>
-`Mount point paths on the host:` <br>
+> Domain: `You Active Directory Domain` <br>
+Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
+Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Mount point paths on the host: <br>
 `C:\Rubrik\dbname\log_c0` <br>
 `C:\Rubrik\dbname\log_c1` <br>
 `C:\Rubrik\dbname\log_c2` <br>
 `C:\Rubrik\dbname\log_c3` 
        
 #### Pane 3
-> `Command  to run on the host:` <br> 
+> Command  to run on the host: <br> 
 `powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -LOG` <br>
-`Enable pre-backup and post-backup commands: Check` <br>
+Enable pre-backup and post-backup commands: `Check` <br>
 
-> `Command to run on successful backup:` <br>
+> Command to run on successful backup: <br>
 `powershell C:/Scripts/rubrik_oracle_SLAMV_arc_log_delete.ps1 -ORACLE_SID dbname` <br>
-`Timeout:` <br>
+Timeout: <br>
 `Set to longer than log delete will take, example 600` <br>
 
 ## B) Cold backup of database not in archive log mode (typically 1 per day)
 
 #### Pane 1
 
-> `Name: dbname` <br>
-`Provisioned Size (GB): 4X allocated  DB size for start` <br>
-`Subnet (Optional): Used if multiple VLANs in use` <br>
-`Number of Channels: If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
-`IP or Hostname: Oracle host with database and Rubrik Connector installed`
+> Name: `dbname` <br>
+Provisioned Size (GB): `4X allocated  DB size for start` <br>
+Subnet (Optional): `Used if multiple VLANs in use` <br>
+Number of Channels: `If not already known use 1 channel per 250G of database size (Note SE oracle only supports 1)` <br>
+IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 
 #### Pane 2
-> `Domain: You Active Directory Domain` <br>
-`Username: The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-`Active Directory Groups (Optional): Can be used instead of th username` <br>
-`Mount point paths on the host:` <br>
+> Domain: `Your Active Directory Domain` <br>
+Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
+Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
 `C:\Rubrik\dbname\db_c2` <br>
 `C:\Rubrik\dbname\db_c3` 
     
 #### Pane 3
-> `Command  to run on the host:` <br> 
+> Command  to run on the host: <br> 
 `powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -DATABASE` <br>
-`Enable pre-backup and post-backup commands: Check` <br>
+Enable pre-backup and post-backup commands: `Check` <br>
 
-> `Command to run before backup:` <br>
+> Command to run before backup: <br>
 `powershell C:/Scripts/rubrik_oracle_cold_prepost.ps1 -ORACLE_SID dbname -MOUNT` <br>
-`Timeout:` <br>
+Timeout:<br>
 `Set to longer than shutdown immediate, startup mount will take, example 300` <br>
-`Cancel backup if pre-backup command fails: Checked` <br>
+Cancel backup if pre-backup command fails: `Checked` <br>
 
-> `Command to run on successful backup:` <br>
+> Command to run on successful backup: <br>
 `powershell C:/Scripts/rubrik_oracle_cold_prepost.ps1 -ORACLE_SID dbname -MOUNT` <br>
-`Timeout:` <br>
+Timeout: <br>
 `Set to longer than the database open will take, example 300` <br>
 
 
