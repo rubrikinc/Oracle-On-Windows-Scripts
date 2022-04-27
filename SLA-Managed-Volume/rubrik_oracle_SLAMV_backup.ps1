@@ -217,6 +217,7 @@ try {
     $Message = $Message + "`nDatabase SID: $ORACLE_SID"
     $Message = $Message + "`nThere was an error connecting to the Rubrik Cluster."
     $Message = $Message + "`nContact Rubrik Support."
+    Write-Host $Message
 
     Write-EventLog -LogName "Application" `
         -Source "Rubrik" `
@@ -238,6 +239,7 @@ $ManagedVolume = Get-RubrikManagedVolume -Name $MV_NAME
     $Message = $Message + "`nThere was an error retrieving the managed volume information from Rubrik Cluster."
     $Message = $Message + "`nManaged Volume return: $ManagedVolume"
     $Message = $Message + "`nContact Rubrik Support."
+    Write-Host $Message
 
     Write-EventLog -LogName "Application" `
         -Source "Rubrik" `
@@ -247,6 +249,23 @@ $ManagedVolume = Get-RubrikManagedVolume -Name $MV_NAME
     Stop-Transcript
     exit 1
 }
+
+ if (-Not $ManagedVolume) {
+    $Message = "Managed Volume Get Error" 
+    $Message = $Message + "`nDatabase SID: $ORACLE_SID"
+    $Message = $Message + "`nInformation for managed volume was not available. Check Managed Volume name."
+    $Message = $Message + "`nManaged Volume return: $ManagedVolume"
+    $Message = $Message + "`nContact Rubrik Support."
+    Write-Host $Message
+
+    Write-EventLog -LogName "Application" `
+        -Source "Rubrik" `
+        -EntryType "Error" `
+        -EventId 55503 `
+        -Message $Message
+    Stop-Transcript
+    exit 1
+} 
 
 Start-Sleep -Seconds 3
 Write-Output ''
