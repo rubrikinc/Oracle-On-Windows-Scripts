@@ -16,6 +16,15 @@ The ORACLE_HOME will can be determined from the registry settings as long as the
 HKEY_LOCAL_MACHINE\SOFTWARE\ORACLE\KEY_(ora home name). If the ORACLE_HOME cannot be determined from the registry
 an ORACLE_HOME parameter must be supplied. 
 
+WARNING: THIS CODE IS PROVIDED ON A BEST EFFORT BASIS AND IS NOT IN ANY WAY OFFICIALLY SUPPORTED 
+OR SANCTIONED BY RUBRIK. THE CODE IN THIS REPOSITORY IS PROVIDED AS-IS AND THE AUTHOR ACCEPTS 
+NO LIABILITY FOR DAMAGES RESULTING FROM ITS USE.
+
+CODE HERE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 .EXAMPLE
 
 This is called from the SLA MV. When setting the post script for the SLA MV use the format: powershell <script path>  <options>
@@ -36,29 +45,13 @@ rce
 
 
 Windows Events logged:
-Event: Rubrik Connection Failed
-Event Type: ERROR
-Event ID: 55500
-
-Event: Managed Volume Get Error
-Event Type: ERROR
-Event ID: 55503
-
-Event: RMAN Backup Failed
-Event Type: ERROR
-Event ID: 55510
-
-Event: RMAN Archivelog Delete Failed
-Event Type: ERROR
-Event ID: 55511
-
-Event: RMAN Script Error
-Event Type: ERROR
-Event ID: 55512
-
-Event: RMAN Backup Completed
+Event: SQLPLUS Script Error
 Event Type: INFORMATION
-Event ID: 55520
+Event ID: 55524
+
+Event: SQLPLUS Error
+Event Type: INFORMATION
+Event ID: 55525
 #>
 
 param (
@@ -96,7 +89,7 @@ If ($MOUNT) {
     Write-EventLog -LogName "Application" `
     -Source "Rubrik" `
     -EntryType "Error" `
-    -EventId 55512 `
+    -EventId 55524 `
     -Message $Message
     exit 1
 }
@@ -179,7 +172,7 @@ if ($MOUNT) {
         Write-EventLog -LogName "Application" `
             -Source "Rubrik" `
             -EntryType "Error" `
-            -EventId 55510 `
+            -EventId 55525 `
             -Message $Message
         Stop-Transcript
         exit 1
@@ -207,7 +200,7 @@ if ($MOUNT) {
         Write-EventLog -LogName "Application" `
             -Source "Rubrik" `
             -EntryType "Error" `
-            -EventId 55510 `
+            -EventId 55525 `
             -Message $Message
         Stop-Transcript
         exit 1
