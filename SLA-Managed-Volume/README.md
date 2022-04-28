@@ -67,7 +67,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `Your Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
@@ -98,7 +98,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `Your Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
@@ -122,7 +122,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `You Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\log_c0` <br>
 `C:\Rubrik\dbname\log_c1` <br>
@@ -152,7 +152,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `Your Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
