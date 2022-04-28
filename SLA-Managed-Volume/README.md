@@ -46,11 +46,11 @@ C:\Rubrik\dbname<br>
 
 > Example of what needs to be configured:<br>
     # Address of the Rubrik CDM cluster (IP or FQDN)<br>
-    $RubrikAddress = '10.1.1.11'<br>
+    `$RubrikAddress = '10.1.1.11'`<br>
     # Location of API key file (optional, can use CredentialFile or RubrikUser/RubrikPassword instead)<br>
-    $ApiTokenFile = 'C:\Rubrik\scripts\RubrikCred.xml'<br>
+    `$ApiTokenFile = 'C:\Rubrik\scripts\RubrikCred.xml'`<br>
     # Log directory - This must exist for the script to run<br>
-    $logdir = 'C:\Rubrik\logs'<br>
+    `$logdir = 'C:\Rubrik\logs'`<br>
 
 ## 7) Create SLA managed volume - Select type of backup
 
