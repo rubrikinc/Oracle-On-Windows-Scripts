@@ -46,11 +46,11 @@ C:\Rubrik\dbname<br>
 
 > Example of what needs to be configured:<br>
     # Address of the Rubrik CDM cluster (IP or FQDN)<br>
-    $RubrikAddress = '10.1.1.11'<br>
+    `$RubrikAddress = '10.1.1.11'`<br>
     # Location of API key file (optional, can use CredentialFile or RubrikUser/RubrikPassword instead)<br>
-    $ApiTokenFile = 'C:\Rubrik\scripts\RubrikCred.xml'<br>
+    `$ApiTokenFile = 'C:\Rubrik\scripts\RubrikCred.xml'`<br>
     # Log directory - This must exist for the script to run<br>
-    $logdir = 'C:\Rubrik\logs'<br>
+    `$logdir = 'C:\Rubrik\logs'`<br>
 
 ## 7) Create SLA managed volume - Select type of backup
 
@@ -67,7 +67,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `Your Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
@@ -98,7 +98,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `Your Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
@@ -122,7 +122,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `You Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\log_c0` <br>
 `C:\Rubrik\dbname\log_c1` <br>
@@ -152,7 +152,7 @@ IP or Hostname: `Oracle host with database and Rubrik Connector installed`
 #### Pane 2
 > Domain: `Your Active Directory Domain` <br>
 Username: `The Active Directory user running Oracle. If running as a system service you can use hostname$ if the host has been added to the Active Directory` <br>
-Active Directory Groups (Optional): `Can be used instead of th username` <br>
+Active Directory Groups (Optional): `Can be used instead of the username` <br>
 Mount point paths on the host: <br>
 `C:\Rubrik\dbname\db_c0` <br>
 `C:\Rubrik\dbname\db_c1` <br>
