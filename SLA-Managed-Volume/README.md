@@ -17,7 +17,8 @@ If not install Windows Management Framework 5.1 or  greater
 
 > Available at https://build.rubrik.com/sdks/powershell/ <br>
 From a Windows Powershell Administrator Shell run:<br>
-`Install-Module Rubrik`
+`Install-Module Rubrik`<br>
+If unable to connect to the Powershell Gallery to download the module, follow the instructions at https://build.rubrik.com/sdks/powershell/ to manually download and install the module. 
 
 > Test with the following:<br>
 `Import-Module Rubrik`<br>
