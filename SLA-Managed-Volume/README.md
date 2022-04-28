@@ -175,4 +175,15 @@ Cancel backup if pre-backup command fails: `Checked` <br>
 Timeout: <br>
 `Set to longer than the database open will take, example 300` <br>
 
+## 8) Apply appropriate SLA Domain Policy to the SLA Managed Volume
 
+### A) Database backup with include archive log backup
+> Use 1 SLA Domain Policy with backup frequency set - typically 1 per day
+
+### B) Database backup with seperate archive log backup
+> Use 1 SLA Domain Policy for the database SLA managed volume with backup frequency set - typically 1 per day. 
+
+>Use a second SLA Domain Policy for the archive log SLA managed volume with the archive log backup frequency set - Anywhere from 15 minutes and up. 
+
+### A) Cold Database backup
+> Use 1 SLA Domain Policy with backup frequency set - typically 1 per day
