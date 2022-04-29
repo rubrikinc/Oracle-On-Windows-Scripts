@@ -77,11 +77,11 @@ Mount point paths on the host: <br>
     
 #### Pane 3
 > Command  to run on the host: <br> 
-`powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname` <br>
 Enable pre-backup and post-backup commands: `Check` <br>
 
 > Command to run on successful backup: <br>
-`powershell C:/Scripts/rubrik_oracle_SLAMV_arc_log_delete.ps1 -ORACLE_SID dbname` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_SLAMV_arc_log_delete.ps1 -ORACLE_SID dbname` <br>
 Timeout: <br>
 `Set to longer than log delete will take, example 600` <br>
 
@@ -108,7 +108,7 @@ Mount point paths on the host: <br>
     
 #### Pane 3
 > Command  to run on the host: <br> 
-`powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -DATABASE` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -DATABASE` <br>
 Enable pre-backup and post-backup commands: `Unchecked` <br>
 
 ### b) Archive Log SLA Managed Volume
@@ -132,11 +132,11 @@ Mount point paths on the host: <br>
        
 #### Pane 3
 > Command  to run on the host: <br> 
-`powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -LOG` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -LOG` <br>
 Enable pre-backup and post-backup commands: `Check` <br>
 
 > Command to run on successful backup: <br>
-`powershell C:/Scripts/rubrik_oracle_SLAMV_arc_log_delete.ps1 -ORACLE_SID dbname` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_SLAMV_arc_log_delete.ps1 -ORACLE_SID dbname` <br>
 Timeout: <br>
 `Set to longer than log delete will take, example 600` <br>
 
@@ -162,17 +162,17 @@ Mount point paths on the host: <br>
     
 #### Pane 3
 > Command  to run on the host: <br> 
-`powershell C:/Rubrik\scripts/rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -DATABASE` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_SLAMV_backup.ps1 -ORACLE_SID dbname -MV_NAME mvname -DATABASE` <br>
 Enable pre-backup and post-backup commands: `Check` <br>
 
 > Command to run before backup: <br>
-`powershell C:/Scripts/rubrik_oracle_cold_prepost.ps1 -ORACLE_SID dbname -MOUNT` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_cold_prepost.ps1 -ORACLE_SID dbname -MOUNT` <br>
 Timeout:<br>
 `Set to longer than shutdown immediate, startup mount will take, example 300` <br>
 Cancel backup if pre-backup command fails: `Checked` <br>
 
 > Command to run on successful backup: <br>
-`powershell C:/Scripts/rubrik_oracle_cold_prepost.ps1 -ORACLE_SID dbname -MOUNT` <br>
+`powershell C:\Rubrik\scripts\rubrik_oracle_cold_prepost.ps1 -ORACLE_SID dbname -OPEN` <br>
 Timeout: <br>
 `Set to longer than the database open will take, example 300` <br>
 
