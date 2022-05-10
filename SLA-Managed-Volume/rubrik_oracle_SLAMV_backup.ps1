@@ -183,16 +183,16 @@ IF ([string]::IsNullOrWhiteSpace($ORACLE_SID)) {
 
 # If an ORACLE_HOME was not supplied, get the ORACLE_HOME from the registry
 IF ([string]::IsNullOrWhiteSpace($ORACLE_HOME)) {
-    # Find the ORACLE_HOME key for the ORACLE_SID
-    $OHKEY=reg query HKEY_LOCAL_MACHINE\SOFTWARE\Oracle\ /s /e /f $ORACLE_SID /c | Select-String "\\KEY"
-    IF ($null -eq $OHKEY) {
-        Write-Host -ForegroundColor Red "Oracle SID '$ORACLE_SID' not found in the registry. Please verify SID name and case."
+    # Find the ORACLE_HOME
+    $ORACLE_HOME = (Get-ItemProperty -Path "Registry::$((Get-ChildItem -Path HKLM:\SOFTWARE\ORACLE | Where-Object {$_.Property -eq "ORACLE_HOME"}).Name)").ORACLE_HOME
+    IF ($null -eq $ORACLE_HOME) {
+        Write-Host -ForegroundColor Red "ORACLE_HOME not found in the registry. Please provide ORACLE_HOME when running this script."
+        exit 1
+    } elseif ($ORACLE_HOME.Count -gt 1) {
+        Write-Host -ForegroundColor Red "Multiple ORACLE_HOMEs ($ORACLE_HOME) found in the registry. Please provide correct ORACLE_HOME when running this script."
         exit 1
     }
-    $OHKEY_VALUE=reg query $OHKEY /V ORACLE_HOME| Select-String REG_SZ
-    $OHKEY_VALUE= -split $OHKEY_VALUE
-    $ORACLE_HOME=$OHKEY_VALUE[2]  
-}
+} 
 
 # Set the environment for the database
 Write-Host  -ForegroundColor Green "Using $ORACLE_HOME to set the environment variables for database $ORACLE_SID."
@@ -486,7 +486,7 @@ Write-EventLog -LogName "Application" `
     -EntryType "Information" `
     -EventId 55520 `
     -Message $Message
-    Write-Host $Message
+Write-Host $Message
 
 # End logging
 Stop-Transcript
