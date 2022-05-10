@@ -26,7 +26,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 .EXAMPLE
 
-.\Rubrik_Oracle_IM_Backup.ps1 -ORACLE_SID dbname -MV_NAME managed_volume_name -ORACLE_HOME oracle_home
+.\rubrik_oracle_mv_backup.ps1 -ORACLE_SID dbname -MV_NAME managed_volume_name -ORACLE_HOME oracle_home
 
 .NOTES
 To prepare to use this script complete the following steps:
@@ -116,11 +116,11 @@ Import-Module Rubrik
 # Edit Variables for you environment
 # Set Rubrik variables
 $RubrikAddress = '10.10.10.1'
-$ApiTokenFile = 'C:\Scripts\RubrikAPI.xml' 
+$ApiTokenFile = 'C:\Rubrik\scripts\RubrikAPI.xml' 
 $CredentialFile = ''
 $RubrikUser = ''
 $RubrikPassword = ''
-$logdir = 'C:\app\oraclesvc\tools\backup\backup_logs'
+$logdir = 'C:\Rubrik\logs'
 $logname = $Oracle_SID + '_rman'
 # Number of days (negative number) of backup logs to retain
 $logRetention = '-7'
@@ -129,18 +129,27 @@ $ARCHIVELOG_NU = 1
 # Number of days of backups to keep on the managed volume and in each Rubrik snapshot
 $DB_BACKUP_RETENTION = 1
 ##########################################################################
+
+
+###################################################
 # Create log file
+###################################################
 $logdate = Get-Date -Format FileDateTime
+$logdate = $logdate -replace ".{4}$"
 $logfile = $logdir + '\' + $logname + $logdate + '.txt'
 
+###################################################
+# Start logging
+###################################################
 $ErrorActionPreference="SilentlyContinue"
 Stop-Transcript | out-null
 $ErrorActionPreference = "Continue"
 # Begin logging
 Start-Transcript -path $logfile -append
 
-
-# Check to be we have an ORACLE_SID
+###################################################
+# Set up ORACLE SID
+###################################################
 IF ([string]::IsNullOrWhiteSpace($ORACLE_SID)) {
     Write-Host -ForegroundColor Red "Invalid number of parameters. The ORACLE_SID is required. Usage: Rubrik_Oracle_IM_Backup.ps1 -ORACLE_SID dbname" 
     exit 1
@@ -165,7 +174,9 @@ $Env:ORACLE_SID=$ORACLE_SID
 $Env:ORACLE_HOME=$ORACLE_HOME
 $env:NLS_DATE_FORMAT="MM/DD/YY HH24:MI:SS"
 
-
+###################################################
+# Connect to the Rubrik CDM and get the managed volume details
+###################################################
 # Set credentials
  if ($ApiTokenFile) {
         $credential = Import-Clixml $ApiTokenFile
@@ -220,7 +231,22 @@ $ManagedVolume = Get-RubrikManagedVolume -Name $MV_NAME
     exit 1
 }
 
+ if (-Not $ManagedVolume) {
+    $Message = "Managed Volume Get Error" 
+    $Message = $Message + "`nDatabase SID: $ORACLE_SID"
+    $Message = $Message + "`nInformation for managed volume was not available. Check Managed Volume name."
+    $Message = $Message + "`nManaged Volume return: $ManagedVolume"
+    $Message = $Message + "`nContact Rubrik Support."
+    Write-Host $Message
 
+    Write-EventLog -LogName "Application" `
+        -Source "Rubrik" `
+        -EntryType "Error" `
+        -EventId 55503 `
+        -Message $Message
+    Stop-Transcript
+    exit 1
+} 
 
 # Break out values in variables
 $SHARE_TYPE = If($null -eq $ManagedVolume.shareType) {"NFS"} Else {$ManagedVolume.shareType}
@@ -239,7 +265,9 @@ foreach($CHANNEL in $CHANNELS) {
     }
 }
 
+###################################################
 # Send the Begin Snapshot API call
+###################################################
 Write-Host "Starting Snapshot for $MV_NAME $MV_ID"
 try {
 $begin_snap_return = Start-RubrikManagedVolumeSnapshot $MV_ID
@@ -260,7 +288,9 @@ $begin_snap_return = Start-RubrikManagedVolumeSnapshot $MV_ID
 }
 
 
+###################################################
 # Run the RMAN database backup
+###################################################
 Start-Sleep -Seconds 3
 Write-Output ''
 Write-Output 'Running RMAN Backup...'
@@ -307,7 +337,9 @@ release channel;
 $SCRIPT | rman nocatalog target=/ | Write-Host
 $rman_return = $?
 
+###################################################
 # Send the End Snapshot API call
+###################################################
 try {
 $end_snap_return = Stop-RubrikManagedVolumeSnapshot $MV_ID
 } catch {
@@ -325,22 +357,9 @@ $end_snap_return = Stop-RubrikManagedVolumeSnapshot $MV_ID
     exit 1
 }
 
-if(-Not $rman_return) {
-    $Message = "RMAN Backup Failed" 
-    $Message = $Message + "`nDatabase SID: $ORACLE_SID"
-    $Message = $Message + "`nThe RMAN backup command failed"
-    $Message = $Message + "`nCheck the backup log: $logfile"
-
-    Write-EventLog -LogName "Application" `
-        -Source "Rubrik" `
-        -EntryType "Error" `
-        -EventId 55510 `
-        -Message $Message
-    Stop-Transcript
-    exit 1
-}
-
+###################################################
 # After end snapshot delete backed up archive logs
+###################################################
 $SCRIPT = @"
 set echo on;
 run {
@@ -366,14 +385,23 @@ if(-Not $rman_return) {
     exit 1
 }
 
-# Check for Errors
+###################################################
+# Check the log files for errors
+###################################################
+Write-Host "Parsing the log file for errors..."
+# Find the RMAN-{0-2] errors in the log
 $errors = Get-Content -path $logfile | Select-String "RMAN-[0-2]"
+# Remove normal errors 
+# Error ignored is "RMAN-08138: warning: archived log not deleted - must create more backups" 
+# Repeat next line for additional errors to ignore
+$errors = $errors | Select-String -notmatch "RMAN-08138"
 if ($errors) {
     $Message = "RMAN Script Error" 
     $Message = $Message + "`nDatabase SID: $ORACLE_SID"
-    $Message = $Message + "`nThe RMAN backup contained errors"
+    $Message = $Message + "`nThe RMAN backup log contained errors"
     $Message = $Message + "`nCheck the backup log: $logfile"
     foreach($line in $errors){$Message = $Message + "`n" + $line}
+     Write-Host $Message
 
     Write-EventLog -LogName "Application" `
         -Source "Rubrik" `
@@ -383,11 +411,18 @@ if ($errors) {
     Stop-Transcript
     exit 1
 }
+Write-Host "The log file looks good!"
 
-# clean up log files
+###################################################
+# Clean up old script logs
+###################################################
+Write-Output "Cleaning up local script logs older than $LogRetention"
 $searchPath = $logdir + '\*.txt'
 Get-ChildItem  $searchPath | Where-Object LastWriteTime -LT (Get-Date).AddDays($logRetention) | Remove-Item
 
+###################################################
+# Finish up log and send success event
+###################################################
 $Message = "RMAN Backup Completed" 
 $Message = $Message + "`nDatabase SID: $ORACLE_SID"
 $Message = $Message + "`nThe RMAN backup completed successfully."
@@ -397,6 +432,8 @@ Write-EventLog -LogName "Application" `
     -EntryType "Information" `
     -EventId 55520 `
     -Message $Message
+
+Write-Host $Message
 
 # End logging
 Stop-Transcript
