@@ -4,17 +4,16 @@
 
 .SYNOPSIS
 
-This PowerShell script will delete backed up archived logs from the Oracle host
+This PowerShell script will shutdown and then mount an Oracle database or it will open a mounted Oracle
+Database.
 
 .DESCRIPTION
 
-This is a post backup script hat will delete archived logs from the oracle host that have been backed up. 
-The ORACLE_SID should match the managed volume name or the managed volume name will need to be supplied. 
-The MV_NAME is optional.
+This is a pre/post backup script that will shutdown and then startup mount an Oracle database. The database
+backup can then run on a database not in archive log mode. This script can then be used to open that database
+as a post script after the database backup is complete. 
 
-The ORACLE_HOME will can be determined from the registry settings as long as there is a registry key set under 
-HKEY_LOCAL_MACHINE\SOFTWARE\ORACLE\KEY_(ora home name). If the ORACLE_HOME cannot be determined from the registry
-an ORACLE_HOME parameter must be supplied. 
+If the ORACLE_HOME cannot be determined from the registry an ORACLE_HOME parameter must be supplied. 
 
 WARNING: THIS CODE IS PROVIDED ON A BEST EFFORT BASIS AND IS NOT IN ANY WAY OFFICIALLY SUPPORTED 
 OR SANCTIONED BY RUBRIK. THE CODE IN THIS REPOSITORY IS PROVIDED AS-IS AND THE AUTHOR ACCEPTS 
@@ -27,8 +26,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 .EXAMPLE
 
-This is called from the SLA MV. When setting the post script for the SLA MV use the format: powershell <script path>  <options>
-powershell C:/Scripts/Rubrik_Oracle_SLAMV_Backup.ps1 -ORACLE_SID dbname -MV_NAME managed_volume_name -LOG
+This is called from the SLA MV. When setting the pre/post scripts for the SLA MV use the format: powershell <script path>  <options>
+PRE SCRIPT>>
+powershell C:/Scripts/Rubrik_Oracle_cold_prepost.ps1 -ORACLE_SID dbsid -MOUNT
+POST SCRIPT>>
+powershell C:/Scripts/Rubrik_Oracle_cold_prepost.ps1 -ORACLE_SID dbsid -OPEN
 
 .NOTES
 To prepare to use this script complete the following steps:
@@ -37,11 +39,8 @@ rce
     From a Windows Powershell Administrative Shell run
         New-EventLog -Source Rubrik -LogName Application
 2) Set Variables as necessary in script:
-    a) Set Rubrik CDM address (Use Floating IP)
-    b) Set appropriate credentials variable, $ApiTokenFile if using API Token, $CredentialFile if using User/passwork or 
-    set $RubrikUser and $RubrikPasswork (Note: only use for tesing)
-    c) Set the $Logdir path (make sure path exists)
-3) Add this script to the combined or log only backup as a post script on successful backup.
+    a) Set the $Logdir path (make sure path exists)
+3) Add this script to the database only backup as a pre or post script on successful backup.
 
 
 Windows Events logged:
@@ -239,9 +238,9 @@ Write-Host "The log file looks good!"
 ###################################################
 # Finish up log and send success event
 ###################################################
-$Message = "RMAN archive log delete Completed" 
+$Message = "RMAN startup mount or open of the database Completed" 
 $Message = $Message + "`nDatabase SID: $ORACLE_SID"
-$Message = $Message + "`nThe RMAN archive log deletion completed successfully."
+$Message = $Message + "`nThe RMAN startup mount or open completed successfully."
 
 Write-EventLog -LogName "Application" `
     -Source "Rubrik" `
