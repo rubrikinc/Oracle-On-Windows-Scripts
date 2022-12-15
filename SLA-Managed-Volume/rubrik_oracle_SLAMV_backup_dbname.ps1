@@ -2,12 +2,13 @@
 
 .SYNOPSIS
 
-This PowerShell script will take a RMAN backup of an Oracle databae to a Rubrik SLA Manged Volume
+This PowerShell script will take a RMAN backup of an Oracle database to a Rubrik SLA Manged Volume
 
 .DESCRIPTION
 
 Use the DATABASE flag for a database only backup, the LOG flag for an archivelog only backup. If no backup type flag (DATABASE or LOG)
-is supplied both a database and archive log backup will be done. 
+is supplied both a database and archive log backup will be done. If doing a combined database and archived log backup, you 
+should be only using a single SLA MV and the $arc_dirs variable should be commented out. 
 
 Note this script does not delete archived logs from the host after they are backed up. This should be done in 
 a post script added to the SLA Managed Volume.
@@ -92,13 +93,13 @@ param (
 ###################################################
 ###################################################
 # Oracle SID
-$ORACLE_SID = 'opera'
+$ORACLE_SID = 'db_name'
 # Oracle HOME - OPTIONAL, if not set the script will attempt to get that from the registry
 $ORACLE_HOME = ''
 # DB SLA MV Export Paths as a power shell array, add all the channels to the array
-$db_dirs = @('D:\RubrikDBBackupScripts\operadb03\db_0','D:\RubrikDBBackupScripts\operadb03\db_1')
+$db_dirs = @('C:\Rubrik\dbname\db_c0','C:\Rubrik\dbname\db_c1')
 # Archive Log SLA MV Export Paths as a power shell array, add all the channels to the array, comment out if only using a DB SLA MV
-$arc_dirs = @('D:\RubrikDBBackupScripts\operadb03\log_0')
+$arc_dirs = @('C:\Rubrik\dbname\log_c0')
 # Log directory - This must exist for the script to run
 $logdir = 'C:\Rubrik\logs'
 # Log name format
@@ -171,6 +172,7 @@ if ($DATABASE) {
     Write-Host "Backup type is combined database and archive log backup"
 }
 
+
 ######################################################################
 # Backup database if a database backup or a combined backup
 ######################################################################
@@ -179,33 +181,33 @@ if (-Not $LOG) {
 
     # Build RMAN backup with channels for the managed volume
     $SCRIPT = @"
-    set echo on;
-    show all;
-    configure controlfile autobackup on;
-    run {
-    set controlfile autobackup format for device type disk to '$($db_dirs[0])\%F';
+set echo on;
+show all;
+configure controlfile autobackup on;
+run {
+set controlfile autobackup format for device type disk to '$($db_dirs[0])\%F';`n
 "@
 
-    for ($i= 0; $i -lt $db_dirs.count ; $i++) {
-        $SCRIPT += "allocate channel ch$i device type disk format '"+$db_dirs[$i]+"\%U';`n"
-    }
-    if ($FULL) {
-    $SCRIPT += @"
-    backup as backupset filesperset 1 section size $($SECTION_SIZE) database tag '$($ORACLE_SID)_incmrg';
-    backup as copy current controlfile;
+for ($i= 0; $i -lt $db_dirs.count ; $i++) {
+    $SCRIPT += "allocate channel ch$i device type disk format '"+$db_dirs[$i]+"\%U';`n"
+}
+if ($FULL) {
+$SCRIPT += @"
+backup as backupset filesperset 1 section size $($SECTION_SIZE) database tag '$($ORACLE_SID)_incmrg';
+backup as copy current controlfile;`n
 "@
-    } else {
-    $SCRIPT += @"
-    backup incremental level 1 for recover of copy with tag '$($ORACLE_SID)_incmrg' database;
-    recover copy of database with tag '$($ORACLE_SID)_incmrg' until time 'SYSDATE-$($DB_BACKUP_RETENTION)';
-    backup as copy current controlfile;
+} else {
+$SCRIPT += @"
+backup incremental level 1 for recover of copy with tag '$($ORACLE_SID)_incmrg' database;
+recover copy of database with tag '$($ORACLE_SID)_incmrg' until time 'SYSDATE-$($DB_BACKUP_RETENTION)';
+backup as copy current controlfile;`n
 "@
-    }
-    for ($i= 0; $i -lt $db_dirs.count; $i++) {
-        $SCRIPT += "release channel ch$i;`n"
-    }
+}
+for ($i= 0; $i -lt $db_dirs.count; $i++) {
+    $SCRIPT += "release channel ch$i;`n"
+}
 
-    $SCRIPT += @"
+$SCRIPT += @"
     }
 "@ 
 
@@ -235,28 +237,34 @@ if (-Not $LOG) {
 
 if ($LOG -Or (-Not $DATABASE)) {
     Write-Output 'Running RMAN Archive Log Backup...'
+    # If there is no archive log directorys set, send the archived logs to the database directories
+    if (-Not $arc_dirs) {
+        $log_backup_dirs = $db_dirs
+    } else {
+        $log_backup_dirs = $arc_dirs
+    }
 
     # Build RMAN backup with channels for the managed volume
     $SCRIPT = @"
-    set echo on;
-    configure controlfile autobackup on;
-    run {
-    set controlfile autobackup format for device type disk to '$($arc_dirs[0])\%F';
+set echo on;
+configure controlfile autobackup on;
+run {
+set controlfile autobackup format for device type disk to '$($log_backup_dirs[0])\%F';`n
 "@
 
-    for ($i= 0; $i -lt $db_dirs.count ; $i++) {
-        $SCRIPT += "allocate channel ch$i device type disk format '"+$arc_dirs[$i]+"\%U';`n"
-    }
+for ($i= 0; $i -lt $db_dirs.count ; $i++) {
+    $SCRIPT += "allocate channel ch$i device type disk format '"+$log_backup_dirs[$i]+"\%U';`n"
+}
 
-    $SCRIPT += @"
-    sql 'alter system archive log current';
-    backup archivelog all;
+$SCRIPT += @"
+sql 'alter system archive log current';
+backup archivelog all;`n
 "@
-    for ($i= 0; $i -lt $db_dirs.count; $i++) {
-        $SCRIPT += "release channel ch$i;`n"
-    }
+for ($i= 0; $i -lt $log_backup_dirs.count; $i++) {
+    $SCRIPT += "release channel ch$i;`n"
+}
 
-    $SCRIPT += @"
+$SCRIPT += @"
     }  
 "@ 
 
@@ -291,10 +299,12 @@ allocate channel for maintenance device type disk;
 "@
 
     for ($i= 0; $i -lt $db_dirs.count ; $i++) {
-        $SCRIPT += "catalog start with '"+$db_dirs[$i]+"' noprompt;`n"
+        $SCRIPT += "catalog start with '"+$db_dirs[$i]+"' noprompt;"
     }
-    for ($i= 0; $i -lt $arc_dirs.count ; $i++) {
-        $SCRIPT += "catalog start with '"+$arc_dirs[$i]+"' noprompt;`n"
+    if ($arc_dirs) {
+        for ($i= 0; $i -lt $arc_dirs.count ; $i++) {
+            $SCRIPT += "catalog start with '"+$arc_dirs[$i]+"' noprompt;"
+        }
     }
 
 $SCRIPT += @"
